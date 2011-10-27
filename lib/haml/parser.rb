@@ -228,7 +228,7 @@ END
     end
 
     def block_keyword(text)
-      if options[:haml_ejs]
+      if HamlEjs.enabled
         haml_ejs_keyword = text.scan(HAML_EJS_BLOCK_KEYWORD_REGEX)[0]
         return haml_ejs_keyword[0] if haml_ejs_keyword
       end
@@ -422,7 +422,7 @@ END
     end
 
     def haml_ejs text
-      # return plain(text) unless options[:haml_ejs]
+      return plain(text) unless HamlEjs.enabled
       case text
       when HAML_EJS_INTERPOLATE; haml_ejs_interpolate($1)
       when HAML_EJS_CONDITIONAL; haml_ejs_conditional($1)

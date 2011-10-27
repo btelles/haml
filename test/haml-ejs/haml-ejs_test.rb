@@ -7,14 +7,14 @@ class HamlEjsTest < Test::Unit::TestCase
     define_method "test_#{File.basename(input_file, File.extname(input_file))}" do
       template_name = File.basename(input_file, File.extname(input_file))
       expected_result = File.read(File.join(templates_dir, "#{template_name}.output"))
-      actual_result = Haml::Engine.new(File.read(input_file), haml_ejs: true).render
+      actual_result = Haml::Engine.new(File.read(input_file)).render
       assert_equal expected_result, actual_result
     end
   end
 
   def test_unknown_sigil
     assert_raise Haml::SyntaxError do
-      Haml::Engine.new("^bwa", haml_ejs: true).render
+      Haml::Engine.new("^bwa").render
     end
   end
 

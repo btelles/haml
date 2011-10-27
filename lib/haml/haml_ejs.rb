@@ -39,10 +39,19 @@ module HamlEjs
     @iterate = sigil
   end
 
+  def self.enabled
+    @enabled
+  end
+
+  def self.enabled= bool
+    @enabled = bool
+  end
+
   self.open_interpolate  = "<%="
   self.close_interpolate = "%>"
   self.open_evaluate     = "<%"
   self.close_evaluate    = "%>"
   self.iterate           = "$.each"
+  self.enabled           = true
 end
 
