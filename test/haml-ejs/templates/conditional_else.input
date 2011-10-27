@@ -1,0 +1,5 @@
+^if conditional2
+  conditional2 is true
+^else
+  conditional2 is not true
+

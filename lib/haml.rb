@@ -45,3 +45,5 @@ end
 require 'haml/util'
 require 'haml/engine'
 require 'haml/railtie'
+require 'haml/haml_ejs'
+

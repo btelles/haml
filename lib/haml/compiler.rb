@@ -210,6 +210,40 @@ END
       filter.internal_compile(self, @node.value[:text])
     end
 
+    def compile_ejs_interpolate
+      push_text("#{HamlEjs.open_interpolate}#{@node.value[:text]}#{HamlEjs.close_interpolate}")
+    end
+
+    def compile_ejs_conditional
+      if @node.value[:else]
+        @output_tabs -= 1
+        if @node.value[:expression]
+          push_text("#{HamlEjs.open_evaluate}}else if(#{@node.value[:expression]}){#{HamlEjs.close_evaluate}", 1)
+        else
+          push_text("#{HamlEjs.open_evaluate}}else{#{HamlEjs.close_evaluate}", 1)
+        end
+      else
+        negate = @node.value[:negate] ? '!' : ''
+        push_text("#{HamlEjs.open_evaluate}if(#{negate}#{@node.value[:expression]}){#{HamlEjs.close_evaluate}", 1)
+        @output_tabs += 1
+      end
+      yield if block_given?
+      if @node.value[:else]
+        @output_tabs += 1
+      else
+        @output_tabs -= 1
+        push_text("#{HamlEjs.open_evaluate}}#{HamlEjs.close_evaluate}", -1)
+      end
+    end
+
+    def compile_ejs_iterate
+      push_text("#{HamlEjs.open_evaluate}#{HamlEjs.iterate}(#{@node.value[:collection]},function(collectionIndex,collectionElement){with(collectionElement){#{HamlEjs.close_evaluate}", 1)
+      @output_tabs += 1
+      yield if block_given?
+      @output_tabs -= 1
+      push_text("#{HamlEjs.open_evaluate}}});#{HamlEjs.close_evaluate}", -1)
+    end
+
     def text_for_doctype
       if @node.value[:type] == "xml"
         return nil if html?

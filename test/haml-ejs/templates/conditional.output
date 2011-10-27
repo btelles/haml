@@ -1,0 +1,3 @@
+<%if(conditional1){%>
+  conditional1 is true
+<%}%>

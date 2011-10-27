@@ -1,0 +1,26 @@
+.primary
+  ^= punctual
+
+^if conditional1
+  conditional1 is true
+
+^unless conditional2
+  conditional2 is not true
+
+^if conditional3
+  conditional3 is true
+^else
+  conditional3 is not true
+
+^if conditional4
+  conditional4 is true
+^elsif conditional5
+  conditional4 is not true and conditional5 is true
+^else
+  conditional4 is not true and conditional5 is not true
+
+^each list
+  .item
+    Item name:
+    ^= name
+

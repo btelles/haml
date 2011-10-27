@@ -1,0 +1,5 @@
+<%if(!conditional8){%>
+  conditional8 is not true
+<%}else{%>
+  conditional8 is true
+<%}%>
