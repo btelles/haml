@@ -1,0 +1,3 @@
+<%$.each(list,function(collectionIndex,collectionElement){with(collectionElement){%>
+  hi
+<%}});%>

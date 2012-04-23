@@ -1,0 +1,5 @@
+<%if(!conditional9){%>
+  conditional9 is not true
+<%}else if(conditional10){%>
+  conditional9 is true and conditional10 is true
+<%}%>

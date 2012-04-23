@@ -1,0 +1,7 @@
+<%if(conditional5){%>
+  conditional5 is true
+<%}else if(conditional6){%>
+  conditional5 is not true and conditional6 is true
+<%}else{%>
+  conditional5 is not true and conditional6 is not true
+<%}%>
