@@ -44,20 +44,20 @@ module Haml
     # Designates a non-parsed line. Not actually a character.
     PLAIN_TEXT      = -1
 
-    # Designates a piece of client-side ejs functionality
-    HAML_EJS = "^"
+    # Designates a piece of client-side javascript functionality
+    JAVASCRIPT = "^"
     # Designates a client-side interpolated ejs value
-    HAML_EJS_INTERPOLATE         = /^#{Regexp.escape(HAML_EJS)}=\s+(.*)$/
+    JAVASCRIPT_INTERPOLATE         = /^#{Regexp.escape(JAVASCRIPT)}=\s+(.*)$/
     # Designates a client-side conditional ejs block
-    HAML_EJS_CONDITIONAL         = /^#{Regexp.escape(HAML_EJS)}if\s+(.*)$/
+    JAVASCRIPT_CONDITIONAL         = /^#{Regexp.escape(JAVASCRIPT)}if\s+(.*)$/
     # Designates a client-side negated conditional ejs block
-    HAML_EJS_NEGATED_CONDITIONAL = /^#{Regexp.escape(HAML_EJS)}unless\s+(.*)$/
+    JAVASCRIPT_NEGATED_CONDITIONAL = /^#{Regexp.escape(JAVASCRIPT)}unless\s+(.*)$/
     # Designates a client-side negated conditional ejs block
-    HAML_EJS_ELSEIF_CONDITIONAL  = /^#{Regexp.escape(HAML_EJS)}elsif\s+(.*)$/
+    JAVASCRIPT_ELSEIF_CONDITIONAL  = /^#{Regexp.escape(JAVASCRIPT)}elsif\s+(.*)$/
     # Designates a client-side negated conditional ejs block
-    HAML_EJS_ELSE_CONDITIONAL    = /^#{Regexp.escape(HAML_EJS)}else\s*$/
+    JAVASCRIPT_ELSE_CONDITIONAL    = /^#{Regexp.escape(JAVASCRIPT)}else\s*$/
     # Designates a client-side iteration ejs block
-    HAML_EJS_ITERATE             = /^#{Regexp.escape(HAML_EJS)}each\s+(.*)$/
+    JAVASCRIPT_ITERATE             = /^#{Regexp.escape(JAVASCRIPT)}each\s+(.*)$/
 
     # Keeps track of the ASCII values of the characters that begin a
     # specially-interpreted line.
@@ -73,7 +73,7 @@ module Haml
       SILENT_SCRIPT,
       ESCAPE,
       FILTER,
-      HAML_EJS
+      JAVASCRIPT
     ]
 
     # The value of the character that designates that a line is part
@@ -85,7 +85,7 @@ module Haml
     # Try to parse assignments to block starters as best as possible
     START_BLOCK_KEYWORD_REGEX = /(?:\w+(?:,\s*\w+)*\s*=\s*)?(#{START_BLOCK_KEYWORDS.join('|')})/
     BLOCK_KEYWORD_REGEX = /^-\s*(?:(#{MID_BLOCK_KEYWORDS.join('|')})|#{START_BLOCK_KEYWORD_REGEX.source})\b/
-    HAML_EJS_BLOCK_KEYWORD_REGEX = /^#{Regexp.escape(HAML_EJS)}(if|else|elsif|unless)\s*/
+    JAVASCRIPT_BLOCK_KEYWORD_REGEX = /^#{Regexp.escape(JAVASCRIPT)}(if|else|elsif|unless)\s*/
 
     # The Regex that matches a Doctype command.
     DOCTYPE_REGEX = /(\d(?:\.\d)?)?[\s]*([a-z]*)\s*([^ ]+)?/i
@@ -222,15 +222,15 @@ END
         return push plain(text[1..-1].strip, !:escape_html) if text[1] == ?\s
         push plain(text)
       when ESCAPE; push plain(text[1..-1])
-      when HAML_EJS; push haml_ejs(text)
+      when JAVASCRIPT; push javascript(text)
       else; push plain(text)
       end
     end
 
     def block_keyword(text)
       if HamlEjs.enabled
-        haml_ejs_keyword = text.scan(HAML_EJS_BLOCK_KEYWORD_REGEX)[0]
-        return haml_ejs_keyword[0] if haml_ejs_keyword
+        javascript_keyword = text.scan(JAVASCRIPT_BLOCK_KEYWORD_REGEX)[0]
+        return javascript_keyword[0] if javascript_keyword
       end
       return unless keyword = text.scan(BLOCK_KEYWORD_REGEX)[0]
       keyword[0] || keyword[1]
@@ -421,30 +421,30 @@ END
       send("close_#{node.type}", node) if respond_to?("close_#{node.type}", :include_private)
     end
 
-    def haml_ejs text
-      return plain(text) unless HamlEjs.enabled
+    def javascript text
+      return plain(text) unless Javascript.enabled
       case text
-      when HAML_EJS_INTERPOLATE; haml_ejs_interpolate($1)
-      when HAML_EJS_CONDITIONAL; haml_ejs_conditional($1)
-      # when HAML_EJS_NEGATED_CONDITIONAL; haml_ejs_negated_conditional($1)
-      when HAML_EJS_ELSE_CONDITIONAL; haml_ejs_conditional($1, :else => true)
-      when HAML_EJS_ELSEIF_CONDITIONAL; haml_ejs_conditional($1, :else => true)
-      when HAML_EJS_NEGATED_CONDITIONAL; haml_ejs_conditional($1, :negate => true)
-      when HAML_EJS_ITERATE; haml_ejs_iterate($1)
+      when JAVASCRIPT_INTERPOLATE; javascript_interpolate($1)
+      when JAVASCRIPT_CONDITIONAL; javascript_conditional($1)
+      # when JAVASCRIPT_NEGATED_CONDITIONAL; javascript_negated_conditional($1)
+      when JAVASCRIPT_ELSE_CONDITIONAL; javascript_conditional($1, :else => true)
+      when JAVASCRIPT_ELSEIF_CONDITIONAL; javascript_conditional($1, :else => true)
+      when JAVASCRIPT_NEGATED_CONDITIONAL; javascript_conditional($1, :negate => true)
+      when JAVASCRIPT_ITERATE; javascript_iterate($1)
       else
-        raise SyntaxError.new("Unknow HamlEjs sigil #{text}")
+        raise SyntaxError.new("Unknow JS sigil #{text}")
       end
     end
 
-    def haml_ejs_interpolate text
+    def javascript_interpolate text
       ParseNode.new(:ejs_interpolate, @index, :text => text)
     end
 
-    def haml_ejs_conditional text, options = {}
+    def javascript_conditional text, options = {}
       ParseNode.new(:ejs_conditional, @index, options.merge(:expression => text))
     end
 
-    def haml_ejs_iterate text
+    def javascript_iterate text
       ParseNode.new(:ejs_iterate, @index, :collection => text)
     end
 
